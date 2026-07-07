@@ -10,7 +10,7 @@
 <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"/>
 <img src="https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
 
-# 🤖 Soen
+# 🤖 SOEN
 
 ### AI Code Generation · Real-Time Collaboration · In-Browser Execution · GitHub Push
 
