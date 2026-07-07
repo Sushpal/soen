@@ -1,0 +1,168 @@
+<svg viewBox="0 0 900 820" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f0f0f"/>
+      <stop offset="100%" stop-color="#151520"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#61dafb"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="820" fill="url(#bgGrad)" rx="16"/>
+
+  <!-- Title -->
+  <text x="450" y="44" text-anchor="middle" font-size="22" font-weight="700" fill="#f0ede8" letter-spacing="1">Soen — System Architecture</text>
+
+  <!-- ─── ROW 1: User ─── -->
+  <rect x="375" y="68" width="150" height="44" rx="10" fill="#1a1a2e" stroke="#61dafb" stroke-width="1.5"/>
+  <text x="450" y="95" text-anchor="middle" font-size="13" font-weight="600" fill="#f0ede8">👤 User</text>
+
+  <!-- arrow down -->
+  <line x1="450" y1="112" x2="450" y2="134" stroke="#61dafb" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="444,131 450,143 456,131" fill="#61dafb"/>
+
+  <!-- ─── ROW 2: React Frontend ─── -->
+  <rect x="275" y="144" width="350" height="54" rx="10" fill="#1a1a2e" stroke="#61dafb" stroke-width="1.5"/>
+  <text x="450" y="167" text-anchor="middle" font-size="13" font-weight="600" fill="#61dafb">⚛ React Frontend</text>
+  <text x="450" y="185" text-anchor="middle" font-size="10" fill="#8a8480">Vite · Tailwind CSS v4 · React Router · Axios</text>
+
+  <!-- two arrows down — REST and Socket -->
+  <line x1="340" y1="198" x2="280" y2="230" stroke="#61dafb" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="274,227 278,240 286,231" fill="#61dafb"/>
+  <line x1="560" y1="198" x2="620" y2="230" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="614,227 622,240 626,229" fill="#a855f7"/>
+
+  <!-- ─── ROW 3: Two lanes — REST API + Socket.io ─── -->
+  <!-- REST API -->
+  <rect x="100" y="240" width="260" height="54" rx="10" fill="#1a1a2e" stroke="#61dafb" stroke-width="1.5"/>
+  <text x="230" y="263" text-anchor="middle" font-size="13" font-weight="600" fill="#61dafb">Express REST API</text>
+  <text x="230" y="281" text-anchor="middle" font-size="10" fill="#8a8480">Node.js · JWT Middleware · CORS · Rate Limit</text>
+
+  <!-- Socket.io -->
+  <rect x="540" y="240" width="260" height="54" rx="10" fill="#1a1a2e" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="670" y="263" text-anchor="middle" font-size="13" font-weight="600" fill="#a855f7">⚡ Socket.io Server</text>
+  <text x="670" y="281" text-anchor="middle" font-size="10" fill="#8a8480">Rooms · Auth Middleware · DB Lookup</text>
+
+  <!-- arrows from REST down to services -->
+  <line x1="160" y1="294" x2="160" y2="330" stroke="#444" stroke-width="1.2"/>
+  <polygon points="154,327 160,339 166,327" fill="#444"/>
+  <line x1="300" y1="294" x2="300" y2="330" stroke="#444" stroke-width="1.2"/>
+  <polygon points="294,327 300,339 306,327" fill="#444"/>
+  <line x1="160" y1="294" x2="300" y2="294" stroke="#333" stroke-width="1.2"/>
+
+  <!-- arrow from Socket.io down to collab -->
+  <line x1="670" y1="294" x2="670" y2="330" stroke="#444" stroke-width="1.2"/>
+  <polygon points="664,327 670,339 676,327" fill="#444"/>
+
+  <!-- ─── ROW 4: Services ─── -->
+  <!-- Auth Service -->
+  <rect x="50" y="340" width="200" height="95" rx="10" fill="#1a1a2e" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="150" y="362" text-anchor="middle" font-size="12" font-weight="700" fill="#a855f7">🔐 Auth Service</text>
+  <text x="150" y="380" text-anchor="middle" font-size="10" fill="#8a8480">POST /api/users/register</text>
+  <text x="150" y="395" text-anchor="middle" font-size="10" fill="#8a8480">POST /api/users/login</text>
+  <text x="150" y="410" text-anchor="middle" font-size="10" fill="#8a8480">POST /api/users/logout</text>
+  <text x="150" y="425" text-anchor="middle" font-size="9" fill="#6b6b8a">bcrypt · JWT · Redis Blacklist</text>
+
+  <!-- Project Service -->
+  <rect x="280" y="340" width="200" height="95" rx="10" fill="#1a1a2e" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="380" y="362" text-anchor="middle" font-size="12" font-weight="700" fill="#4ade80">📁 Project Service</text>
+  <text x="380" y="380" text-anchor="middle" font-size="10" fill="#8a8480">POST /api/projects/create</text>
+  <text x="380" y="395" text-anchor="middle" font-size="10" fill="#8a8480">GET  /api/projects/all</text>
+  <text x="380" y="410" text-anchor="middle" font-size="10" fill="#8a8480">PUT  /api/projects/update-file-tree</text>
+  <text x="380" y="425" text-anchor="middle" font-size="9" fill="#6b6b8a">Ownership Check · File Tree</text>
+
+  <!-- Collaboration Service (Socket) -->
+  <rect x="540" y="340" width="260" height="95" rx="10" fill="#1a1a2e" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="670" y="362" text-anchor="middle" font-size="12" font-weight="700" fill="#a855f7">🤝 Collaboration</text>
+  <text x="670" y="380" text-anchor="middle" font-size="10" fill="#8a8480">project-message event</text>
+  <text x="670" y="395" text-anchor="middle" font-size="10" fill="#8a8480">file-tree-update event</text>
+  <text x="670" y="410" text-anchor="middle" font-size="10" fill="#8a8480">Room scoped per projectId</text>
+  <text x="670" y="425" text-anchor="middle" font-size="9" fill="#6b6b8a">Broadcast · Persist · Sync</text>
+
+  <!-- AI + GitHub below REST services -->
+  <!-- arrows down from Project service and Auth service to their deps -->
+  <line x1="150" y1="435" x2="150" y2="475" stroke="#444" stroke-width="1.2"/>
+  <polygon points="144,472 150,484 156,472" fill="#444"/>
+  <line x1="380" y1="435" x2="380" y2="475" stroke="#444" stroke-width="1.2"/>
+  <polygon points="374,472 380,484 386,472" fill="#444"/>
+  <line x1="150" y1="475" x2="380" y2="475" stroke="#333" stroke-width="1.2"/>
+
+  <!-- arrow from Collab down to MongoDB -->
+  <line x1="670" y1="435" x2="670" y2="475" stroke="#444" stroke-width="1.2"/>
+  <polygon points="664,472 670,484 676,472" fill="#444"/>
+
+  <!-- ─── ROW 5: AI + GitHub ─── -->
+  <!-- AI Service -->
+  <rect x="50" y="485" width="200" height="80" rx="10" fill="#1a1a2e" stroke="#f87171" stroke-width="1.5"/>
+  <text x="150" y="508" text-anchor="middle" font-size="12" font-weight="700" fill="#f87171">🤖 AI Service</text>
+  <text x="150" y="526" text-anchor="middle" font-size="10" fill="#8a8480">GET /api/ai/get-result</text>
+  <text x="150" y="541" text-anchor="middle" font-size="10" fill="#8a8480">OpenAI GPT-4o-mini</text>
+  <text x="150" y="556" text-anchor="middle" font-size="9" fill="#6b6b8a">Prompt → JSON → File Tree</text>
+
+  <!-- GitHub Service -->
+  <rect x="280" y="485" width="200" height="80" rx="10" fill="#1a1a2e" stroke="#e0c080" stroke-width="1.5"/>
+  <text x="380" y="508" text-anchor="middle" font-size="12" font-weight="700" fill="#e0c080">🐙 GitHub Service</text>
+  <text x="380" y="526" text-anchor="middle" font-size="10" fill="#8a8480">POST /api/github/create-repo</text>
+  <text x="380" y="541" text-anchor="middle" font-size="10" fill="#8a8480">POST /api/github/push-file</text>
+  <text x="380" y="556" text-anchor="middle" font-size="9" fill="#6b6b8a">Backend Proxy · COEP Bypass</text>
+
+  <!-- arrows down from AI+GitHub to MongoDB -->
+  <line x1="265" y1="565" x2="380" y2="598" stroke="#333" stroke-width="1.2"/>
+  <polygon points="374,595 382,608 387,597" fill="#333"/>
+  <line x1="670" y1="485" x2="670" y2="598" stroke="#444" stroke-width="1.2"/>
+  <polygon points="664,595 670,607 676,595" fill="#444"/>
+
+  <!-- ─── ROW 6: MongoDB + Redis ─── -->
+  <!-- MongoDB -->
+  <rect x="220" y="608" width="260" height="44" rx="10" fill="#1a1a2e" stroke="#47a248" stroke-width="1.5"/>
+  <text x="350" y="631" text-anchor="middle" font-size="13" font-weight="600" fill="#47a248">🍃 MongoDB Database</text>
+  <text x="350" y="645" text-anchor="middle" font-size="10" fill="#8a8480">Users · Projects · File Trees · Messages</text>
+
+  <!-- Redis -->
+  <rect x="580" y="608" width="220" height="44" rx="10" fill="#1a1a2e" stroke="#dc382d" stroke-width="1.5"/>
+  <text x="690" y="631" text-anchor="middle" font-size="13" font-weight="600" fill="#dc382d">⚡ Redis</text>
+  <text x="690" y="645" text-anchor="middle" font-size="10" fill="#8a8480">JWT Blacklist · 24h TTL Auto-Expiry</text>
+
+  <!-- arrows down from MongoDB to collections -->
+  <line x1="290" y1="652" x2="240" y2="686" stroke="#333" stroke-width="1.2"/>
+  <polygon points="234,683 238,696 246,687" fill="#333"/>
+  <line x1="410" y1="652" x2="460" y2="686" stroke="#333" stroke-width="1.2"/>
+  <polygon points="454,683 462,696 466,685" fill="#333"/>
+
+  <!-- ─── ROW 7: Collections ─── -->
+  <!-- Users + Projects collection -->
+  <rect x="80" y="696" width="280" height="88" rx="10" fill="#0f1a10" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="220" y="718" text-anchor="middle" font-size="12" font-weight="700" fill="#4ade80">👥 Users Collection</text>
+  <text x="220" y="736" text-anchor="middle" font-size="10" fill="#8a8480">email · password (bcrypt) · timestamps</text>
+  <text x="220" y="751" text-anchor="middle" font-size="10" fill="#8a8480">generateJWT() · isValidPassword()</text>
+  <text x="220" y="766" text-anchor="middle" font-size="9" fill="#6b6b8a">pre('save') hook · select: false on password</text>
+  <text x="220" y="779" text-anchor="middle" font-size="9" fill="#6b6b8a">Mongoose ODM · Atlas / Local</text>
+
+  <!-- Projects collection -->
+  <rect x="400" y="696" width="300" height="88" rx="10" fill="#1a0f1a" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="550" y="718" text-anchor="middle" font-size="12" font-weight="700" fill="#a855f7">📁 Projects Collection</text>
+  <text x="550" y="736" text-anchor="middle" font-size="10" fill="#8a8480">name · users[] · fileTree · messages[]</text>
+  <text x="550" y="751" text-anchor="middle" font-size="10" fill="#8a8480">collaborators (ObjectId refs)</text>
+  <text x="550" y="766" text-anchor="middle" font-size="10" fill="#8a8480">Chat history persisted on document</text>
+  <text x="550" y="779" text-anchor="middle" font-size="9" fill="#6b6b8a">Ownership enforced at controller level</text>
+
+  <!-- WebContainer at bottom right -->
+  <rect x="720" y="696" width="140" height="88" rx="10" fill="#1a1a10" stroke="#e0c080" stroke-width="1.5"/>
+  <text x="790" y="718" text-anchor="middle" font-size="11" font-weight="700" fill="#e0c080">🌐 WebContainer</text>
+  <text x="790" y="736" text-anchor="middle" font-size="9" fill="#8a8480">In-Browser Node.js</text>
+  <text x="790" y="751" text-anchor="middle" font-size="9" fill="#8a8480">npm install</text>
+  <text x="790" y="766" text-anchor="middle" font-size="9" fill="#8a8480">node app.js</text>
+  <text x="790" y="779" text-anchor="middle" font-size="9" fill="#6b6b8a">Live at port 8080</text>
+
+  <!-- footer tag line -->
+  <rect x="200" y="798" width="500" height="26" rx="8" fill="#1a1a1a" stroke="#61dafb" stroke-width="1"/>
+  <text x="450" y="816" text-anchor="middle" font-size="11" fill="#61dafb" font-family="'Courier New', monospace">Describe It · Run It · Ship It  ·  Powered by WebContainers + GPT-4o-mini + Socket.io</text>
+
+</svg>

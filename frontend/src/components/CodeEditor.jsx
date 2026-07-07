@@ -19,19 +19,31 @@ const CodeEditor = ({
     webContainerRef
 }) => {
 
-    const runProject = async () => {
+   const runProject = async () => {
 
-        setTerminalOutput([]);
+    if (!webContainerRef.current) return;
 
+    setTerminalOutput([]);
+    setIsRunning(true);
+
+    try {
+
+        // Stop previous server
         if (runProcessRef.current) {
-            runProcessRef.current.kill();
+            try {
+                runProcessRef.current.kill();
+            } catch {}
+
             runProcessRef.current = null;
 
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Give WebContainer a moment to free port 8080
+            await new Promise(resolve => setTimeout(resolve, 300));
         }
 
+        // Update filesystem
         await webContainerRef.current.mount(fileTree);
 
+        // Install dependencies
         const installProcess = await webContainerRef.current.spawn(
             "npm",
             ["install"]
@@ -45,8 +57,19 @@ const CodeEditor = ({
             })
         );
 
-        await installProcess.exit;
+        const installExitCode = await installProcess.exit;
 
+        if (installExitCode !== 0) {
+            setTerminalOutput(prev => [
+                ...prev,
+                "\nnpm install failed.\n"
+            ]);
+
+            setIsRunning(false);
+            return;
+        }
+
+        // Start application
         const process = await webContainerRef.current.spawn(
             startCommand?.mainItem || "node",
             startCommand?.commands || ["app.js"]
@@ -62,8 +85,25 @@ const CodeEditor = ({
 
         runProcessRef.current = process;
 
-        setIsRunning(true);
-    };
+        process.exit.then(() => {
+            if (runProcessRef.current === process) {
+                runProcessRef.current = null;
+                setIsRunning(false);
+            }
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        setTerminalOutput(prev => [
+            ...prev,
+            `\n ${err.message}\n`
+        ]);
+
+        setIsRunning(false);
+    }
+};
 
     return (
         <div className="code-editor flex flex-col flex-grow h-full shrink">

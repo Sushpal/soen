@@ -68,44 +68,8 @@ Every project is a live, collaborative workspace. Multiple users can join the sa
 
 ## 🏗️ System Architecture
 
-Below is the high-level architecture of Soen showing how the frontend, backend, AI service, database, Redis, WebContainer, and GitHub integration interact.
+![System Architecture](./assets/architecture.svg)
 
-```
-                        ┌──────────────────┐
-                        │      User        │
-                        └────────┬─────────┘
-                                 │
-                                 ▼
-                       React Frontend (Vite)
-                                 │
-                    ┌────────────┴────────────┐
-                    ▼                         ▼
-             REST API Layer            Socket.io Layer
-             Express Routes            Real-time Events
-                    │                         │
-        ┌───────────┼───────────┐             │
-        ▼           ▼           ▼             ▼
-   Auth Service  Project    AI Service    Collaboration
-   JWT + Redis   Service    OpenAI GPT    File Sync
-   bcrypt        MongoDB    gpt-4o-mini   Chat Messages
-        │           │           │
-        └───────────┼───────────┘
-                    ▼
-             MongoDB Database
-                    │
-        ┌───────────┴───────────┐
-        ▼                       ▼
-     Users                  Projects
-     JWT Blacklist           File Trees
-     Redis TTL               Chat History
-                             Collaborators
-                                 │
-                                 ▼
-                          WebContainer
-                          (In-Browser Node.js)
-                          npm install → node app.js
-                          Live preview at port 8080
-```
 
 ---
 
