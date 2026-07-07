@@ -18,7 +18,7 @@ const app = express()
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://soen.vercel.app'
+        'https://soen-pink.vercel.app'
     ],
     credentials: true
 }))
@@ -32,6 +32,12 @@ app.use(cookieParser())
 app.use(globalLimiter)
 
 // use Routes
+app.get("/", (req, res) => {
+    res.json({
+        status: "OK",
+        message: "Soen Backend is running 🚀"
+    });
+});
 app.use('/api/users',    userRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/ai',       aiRoutes)
