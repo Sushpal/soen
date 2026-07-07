@@ -20,12 +20,6 @@ A full-stack AI-powered collaborative coding platform — describe what you want
 
 ---
 
-## 🚀 Demo
-
-> Coming Soon
-
----
-
 ## 📌 Problem Statement
 
 Most developers waste hours on project scaffolding, boilerplate setup, and environment configuration before writing a single line of business logic.
@@ -70,6 +64,35 @@ Every project is a live, collaborative workspace. Multiple users can join the sa
 
 ![System Architecture](./assets/architecture.svg)
 
+---
+
+## 📸 Screenshots
+
+### 🏠 Dashboard
+
+Shows all projects, collaborators, and quick project creation.
+
+![Dashboard](./assets/dashboard.png)
+
+---
+
+### 💻 Collaborative Workspace
+
+The main development workspace featuring AI chat, collaborative code editor, integrated terminal, and live application preview.
+
+![Collaborative Workspace](./assets/workspace.png)
+
+---
+
+## 🚀 Live Demo
+
+### 🌐 Frontend
+
+https://soen-pink.vercel.app
+
+### ⚙️ Backend API
+
+https://soen-jlru.onrender.com
 
 ---
 
