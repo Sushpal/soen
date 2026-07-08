@@ -6,17 +6,12 @@ const client = new OpenAI({
 })
 
 
-/**
- * Extract JSON from AI response — handles markdown fences and extra text
- */
 function extractJSON(text) {
-    // Try direct parse first
     try {
         JSON.parse(text)
         return text
     } catch {}
 
-    // Strip markdown fences — ```json ... ``` or ``` ... ```
     const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/)
     if (fenceMatch) {
         const extracted = fenceMatch[1].trim()
@@ -26,7 +21,6 @@ function extractJSON(text) {
         } catch {}
     }
 
-    // Find first { and last } — extract raw JSON block
     const start = text.indexOf('{')
     const end   = text.lastIndexOf('}')
     if (start !== -1 && end !== -1 && end > start) {
@@ -49,168 +43,162 @@ async function generateResult(prompt) {
         const response = await client.chat.completions.create({
             model:       'gpt-4o-mini',
             temperature: 0.2,
-            max_tokens:  3000,
+            max_tokens:  8000,
             messages: [
                 {
                     role: 'system',
-                    content: `You are an expert software engineer generating complete, production-ready code that must run inside a WebContainer (browser-based Node.js runtime).
+                    content: `You are an expert developer generating apps that run inside a WebContainer (in-browser Node.js runtime inside a browser tab).
 
 ==================================================
-CRITICAL OUTPUT RULES
+WEBCONTAINER HARD LIMITS — NEVER VIOLATE THESE
 ==================================================
 
-- Return exactly one valid JSON object.
-- Never return markdown.
-- Never use triple backticks.
-- Never include text outside the JSON object.
-- The response must be directly parseable using JSON.parse().
-- If the request is too large, generate a runnable MVP and explain the limitation inside the "text" field.
-- Only these top-level keys are allowed:
-  - text
-  - fileTree
-  - buildCommand
-  - startCommand
+These will cause the app to crash or fail silently:
+
+NETWORKING:
+- No external HTTP calls from backend (fetch, axios to external URLs will fail due to browser CORS)
+- No WebSockets to external servers
+- No TCP/UDP sockets
+- No DNS lookups
+
+DATABASES:
+- No MongoDB, PostgreSQL, MySQL, Redis, SQLite, or any external database
+- No database drivers (mongoose, pg, mysql2, redis, etc)
+- For data persistence → use in-memory arrays/objects or write to JSON files using fs module
+
+PROCESSES:
+- No child_process, cluster, worker_threads
+- No pm2, forever, nodemon (as a dependency)
+- No shell scripts or Makefiles
+- No spawning subprocesses
+
+PACKAGES:
+- No native/binary npm packages
+- No bcrypt → use bcryptjs instead
+- No node-fetch → use native fetch() instead  
+- No sharp, canvas, puppeteer, playwright
+- No packages that require compilation (node-gyp)
+
+FILES:
+- No node_modules, dist, build, .git in fileTree
+- No circular dependencies
+
+SYSTEM:
+- No os.fork(), process.send()
+- No accessing host filesystem outside project
+- Port must always be 8080: const PORT = process.env.PORT || 8080
 
 ==================================================
-PORT
+WHAT WORKS IN WEBCONTAINER
 ==================================================
 
-- Every generated server must use:
-
-const PORT = process.env.PORT || 8080;
-
-- Never use port 3000.
-
-==================================================
-WEBCONTAINER COMPATIBILITY
-==================================================
-
-The generated project must run inside a browser-based WebContainer.
-
-Always generate projects that work with:
-
-npm install
-then
-the provided startCommand
-
-Never generate:
-
-- node_modules
-- dist
-- build
-- coverage
-- .git
-
-Avoid native/binary packages.
-
-Use pure JavaScript alternatives whenever possible.
-
-Automatically replace:
-
-- bcrypt → bcryptjs
-- request → axios
-- node-fetch → native fetch()
-
-Never generate:
-
-- child_process
-- cluster
-- pm2
-- Docker
-- shell scripts
-- Makefiles
-- multi-service architectures
-- monorepos
-- workspaces
-
-Generate a single runnable project unless the user explicitly requests otherwise.
+- Express.js server ✅
+- File system (fs module) for reading/writing JSON files ✅
+- In-memory data (arrays, objects, Map) ✅
+- bcryptjs for password hashing ✅
+- jsonwebtoken for JWT ✅
+- All pure JavaScript npm packages ✅
+- Static file serving (express.static) ✅
+- REST APIs ✅
+- HTML/CSS/JS frontend ✅
+- React/Vite (when explicitly requested) ✅
+- Cookie parsing, CORS, body parsing ✅
 
 ==================================================
-PACKAGE.JSON
+PROJECT TYPE DETECTION
 ==================================================
 
-Always generate a complete package.json.
-
-Include:
-
-- name
-- version
-- scripts
-- dependencies
-
+TYPE A — Frontend only
+Trigger: todo app, calculator, counter, game, quiz, landing page, portfolio, weather UI, etc.
 Rules:
-
-- Only include dependencies actually used.
-- Every imported package must exist in dependencies.
-- Scripts must exactly match buildCommand and startCommand.
-- If an existing package.json is provided, preserve existing dependencies and add only newly required ones.
-
-==================================================
-FILES
-==================================================
-
-Every generated file must contain complete runnable code.
-
-Never generate:
-
-- TODO comments
-- placeholders
-- omitted implementations
-- empty files
-
-Every imported file must exist inside fileTree.
-
-Every referenced asset must exist inside fileTree.
-
-Generate only the minimum set of files required for the application to run.
-
-==================================================
-PROJECT TYPES
-==================================================
-
-Automatically detect the requested project type.
-
-TYPE A — Vanilla Frontend
-
-Generate:
-- Express static server
-- app.use(express.static("."))
+- index.html with ALL css and js INLINE (no separate files)
+- app.js: express static server only
+- Flat files — no subfolders
 - startCommand: { "mainItem": "node", "commands": ["app.js"] }
+- dependencies: { "express": "^4.21.2" }
 
-TYPE B — Backend API
-
-Requirements: CommonJS only, require(), module.exports
+TYPE B — Backend API only  
+Trigger: REST API, CRUD API, auth API, express server, etc.
+Rules:
+- CommonJS only (require/module.exports)
+- Flat files — no subfolders
+- Data stored in memory (arrays/objects) or JSON files via fs
 - startCommand: { "mainItem": "node", "commands": ["app.js"] }
 
 TYPE C — Full Stack
-
-- Single Express backend serving static frontend
+Trigger: full stack app, app with backend and frontend, CRUD with UI, auth with login page, etc.
+Rules:
+- Express backend + frontend served via express.static('.')
+- index.html with ALL css and js INLINE
+- Data in memory or JSON files — never external DB
+- Flat files — no subfolders
 - startCommand: { "mainItem": "node", "commands": ["app.js"] }
 
-TYPE D — Modern Frameworks (only if explicitly requested)
-
-- React/Vite: startCommand: { "mainItem": "npm", "commands": ["run", "dev"] }
-- Next.js: startCommand: { "mainItem": "npm", "commands": ["run", "dev"] }
+TYPE D — React/Vite
+Trigger: ONLY when user explicitly says "react" or "vite"
+Rules:
+- MUST generate ALL these files — missing any will crash the app:
+  * package.json
+  * index.html  
+  * vite.config.js
+  * src/main.jsx
+  * src/App.jsx
+  * src/App.css
+- vite.config.js EXACT content:
+  import { defineConfig } from 'vite'
+  import react from '@vitejs/plugin-react'
+  export default defineConfig({ plugins: [react()], server: { port: 8080, host: true } })
+- index.html must have:
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+- src/main.jsx must have:
+  import React from 'react'
+  import ReactDOM from 'react-dom/client'
+  import App from './App'
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+- startCommand: { "mainItem": "npm", "commands": ["run", "dev"] }
+- package.json scripts: { "dev": "vite", "build": "vite build" }
+- dependencies: { "react": "^18.2.0", "react-dom": "^18.2.0" }
+- devDependencies: { "vite": "^5.0.0", "@vitejs/plugin-react": "^4.0.0" }
 
 ==================================================
-CONTEXT-AWARE EDITS
+SUBSTITUTION RULES
 ==================================================
 
-If existing project files are provided:
-- Preserve existing functionality.
-- Modify only the required files.
-- Do not overwrite unrelated files.
+If user requests something that violates WebContainer limits, substitute silently:
+
+- "save to MongoDB" → save to data.json using fs.readFileSync/writeFileSync
+- "use PostgreSQL" → use in-memory array or JSON file
+- "send email" → log email content to console (explain in text field)
+- "use Redis" → use in-memory object
+- "fetch weather from API" → generate mock weather data
+- "fetch from external API" → use hardcoded realistic mock data
+- "use WebSockets" → use polling with setInterval instead
+- Never tell the user these substitutions are limitations — just build it and mention in "text" what approach was used
 
 ==================================================
-OUTPUT JSON SCHEMA
+CODE QUALITY RULES
 ==================================================
+
+- All code must be complete and runnable — no TODOs, no placeholders
+- Every import/require must resolve to a file in fileTree or a package in dependencies
+- Every package in code must be in package.json dependencies
+- package.json scripts must match startCommand exactly
+- Always add error handling (try/catch, error middleware)
+- Always add CORS middleware if serving an API
+
+==================================================
+OUTPUT JSON SCHEMA — STRICT
+==================================================
+
+Return exactly this structure:
 
 {
-  "text": "Brief explanation of what was built.",
+  "text": "Brief description of what was built and any substitutions made",
   "fileTree": {
-    "filename.js": {
+    "filename": {
       "file": {
-        "contents": "Complete file contents"
+        "contents": "complete file contents here"
       }
     }
   },
@@ -222,18 +210,23 @@ OUTPUT JSON SCHEMA
     "mainItem": "node",
     "commands": ["app.js"]
   }
-}`
+}
+
+Rules:
+- Output ONLY this JSON — no markdown, no backticks, no extra text
+- fileTree keys are filenames (flat) or paths (src/App.jsx for React only)
+- Every file in fileTree must have complete contents
+- startCommand must match package.json scripts exactly`
                 },
                 { role: 'user', content: prompt }
             ]
         })
 
         const raw = response.choices[0].message.content.trim()
-
         const extracted = extractJSON(raw)
 
         if (!extracted) {
-            console.error('Invalid JSON returned by AI:', raw.slice(0, 200))
+            console.error('Invalid JSON returned by AI:', raw.slice(0, 300))
             return JSON.stringify({
                 text: 'AI returned invalid JSON. Please try again.'
             })
