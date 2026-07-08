@@ -6,15 +6,50 @@ const client = new OpenAI({
 })
 
 
+/**
+ * Extract JSON from AI response — handles markdown fences and extra text
+ */
+function extractJSON(text) {
+    // Try direct parse first
+    try {
+        JSON.parse(text)
+        return text
+    } catch {}
+
+    // Strip markdown fences — ```json ... ``` or ``` ... ```
+    const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+    if (fenceMatch) {
+        const extracted = fenceMatch[1].trim()
+        try {
+            JSON.parse(extracted)
+            return extracted
+        } catch {}
+    }
+
+    // Find first { and last } — extract raw JSON block
+    const start = text.indexOf('{')
+    const end   = text.lastIndexOf('}')
+    if (start !== -1 && end !== -1 && end > start) {
+        const extracted = text.slice(start, end + 1)
+        try {
+            JSON.parse(extracted)
+            return extracted
+        } catch {}
+    }
+
+    return null
+}
+
+
 async function generateResult(prompt) {
     try {
 
         console.log('AI called with prompt:', prompt)
 
         const response = await client.chat.completions.create({
-            model:      'gpt-4o-mini',
+            model:       'gpt-4o-mini',
             temperature: 0.2,
-            max_tokens: 3000,
+            max_tokens:  3000,
             messages: [
                 {
                     role: 'system',
@@ -137,201 +172,34 @@ Automatically detect the requested project type.
 
 TYPE A — Vanilla Frontend
 
-Examples:
-
-- Todo App
-- Calculator
-- Landing Page
-- Portfolio
-- Weather App
-
 Generate:
-
 - Express static server
 - app.use(express.static("."))
-
-Server:
-
-const PORT = process.env.PORT || 8080;
-
-buildCommand
-
-{
-  "mainItem":"npm",
-  "commands":["install"]
-}
-
-startCommand
-
-{
-  "mainItem":"node",
-  "commands":["app.js"]
-}
-
---------------------------------------------------
+- startCommand: { "mainItem": "node", "commands": ["app.js"] }
 
 TYPE B — Backend API
 
-Examples:
-
-- REST API
-- CRUD
-- Authentication
-- Express
-- MongoDB API
-
-Requirements:
-
-- CommonJS only
-- require()
-- module.exports
-
-Never use:
-
-- import
-- export
-- window
-- document
-- localStorage
-
-Server:
-
-const PORT = process.env.PORT || 8080;
-
-buildCommand
-
-{
-  "mainItem":"npm",
-  "commands":["install"]
-}
-
-startCommand
-
-{
-  "mainItem":"node",
-  "commands":["app.js"]
-}
-
---------------------------------------------------
+Requirements: CommonJS only, require(), module.exports
+- startCommand: { "mainItem": "node", "commands": ["app.js"] }
 
 TYPE C — Full Stack
 
-Generate:
+- Single Express backend serving static frontend
+- startCommand: { "mainItem": "node", "commands": ["app.js"] }
 
-- Single Express backend
-- Static frontend served using express.static()
+TYPE D — Modern Frameworks (only if explicitly requested)
 
-Server:
-
-const PORT = process.env.PORT || 8080;
-
-buildCommand
-
-{
-  "mainItem":"npm",
-  "commands":["install"]
-}
-
-startCommand
-
-{
-  "mainItem":"node",
-  "commands":["app.js"]
-}
-
---------------------------------------------------
-
-TYPE D — Modern Frameworks
-
-Only generate these if explicitly requested:
-
-- React
-- Vite
-- Next.js
-- Astro
-
-Configure them to run on port 8080.
-
-Vite
-
-buildCommand
-
-{
-  "mainItem":"npm",
-  "commands":["install"]
-}
-
-startCommand
-
-{
-  "mainItem":"npm",
-  "commands":["run","dev"]
-}
-
-Next.js
-
-buildCommand
-
-{
-  "mainItem":"npm",
-  "commands":["install"]
-}
-
-startCommand
-
-{
-  "mainItem":"npm",
-  "commands":["run","dev"]
-}
-
-React (CRA)
-
-buildCommand
-
-{
-  "mainItem":"npm",
-  "commands":["install"]
-}
-
-startCommand
-
-{
-  "mainItem":"npm",
-  "commands":["start"]
-}
+- React/Vite: startCommand: { "mainItem": "npm", "commands": ["run", "dev"] }
+- Next.js: startCommand: { "mainItem": "npm", "commands": ["run", "dev"] }
 
 ==================================================
 CONTEXT-AWARE EDITS
 ==================================================
 
 If existing project files are provided:
-
 - Preserve existing functionality.
 - Modify only the required files.
-- Reuse existing code whenever possible.
 - Do not overwrite unrelated files.
-- Do not delete unrelated files.
-
-==================================================
-SELF CHECK
-==================================================
-
-Before responding internally verify:
-
-- The JSON parses correctly.
-- Every import resolves.
-- Every referenced file exists.
-- Every imported package exists in package.json.
-- package.json scripts match buildCommand and startCommand.
-- The project runs after:
-
-npm install
-
-followed by
-
-startCommand
-
-without requiring manual changes.
 
 ==================================================
 OUTPUT JSON SCHEMA
@@ -340,7 +208,7 @@ OUTPUT JSON SCHEMA
 {
   "text": "Brief explanation of what was built.",
   "fileTree": {
-    "...": {
+    "filename.js": {
       "file": {
         "contents": "Complete file contents"
       }
@@ -348,15 +216,11 @@ OUTPUT JSON SCHEMA
   },
   "buildCommand": {
     "mainItem": "npm",
-    "commands": [
-      "install"
-    ]
+    "commands": ["install"]
   },
   "startCommand": {
     "mainItem": "node",
-    "commands": [
-      "app.js"
-    ]
+    "commands": ["app.js"]
   }
 }`
                 },
@@ -364,18 +228,19 @@ OUTPUT JSON SCHEMA
             ]
         })
 
-        const text = response.choices[0].message.content.trim();
-          try {
-              JSON.parse(text);
-              console.log("AI response:", text);
-              return text;
-          } catch (err) {
-              console.error("Invalid JSON returned by AI:", err.message);
+        const raw = response.choices[0].message.content.trim()
 
-              return JSON.stringify({
-                  text: "AI returned invalid JSON."
-              });
-          }
+        const extracted = extractJSON(raw)
+
+        if (!extracted) {
+            console.error('Invalid JSON returned by AI:', raw.slice(0, 200))
+            return JSON.stringify({
+                text: 'AI returned invalid JSON. Please try again.'
+            })
+        }
+
+        console.log('AI response valid JSON ✅')
+        return extracted
 
     } catch (error) {
         console.log('AI error:', error.message)
